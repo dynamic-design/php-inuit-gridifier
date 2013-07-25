@@ -87,7 +87,8 @@ function gridify($grid_items, $preffered_item_span_per_row) {
 
 	$grids = array();
 	foreach ($expected_ordered_a as $expexted_ordered => $header_array) {
-		$rows_with_these_headers = sizeof($header_array)/$expexted_ordered;
+
+		$rows_with_these_headers = ($expexted_ordered == 0) ? 0 : sizeof($header_array)/$expexted_ordered;
 
 		for ($i = 0; $i < $rows_with_these_headers ; $i++) {
 			$grid_items_with_headers = array();
@@ -155,7 +156,10 @@ function get_grid_headers($number_of_items, $preffered_item_span_per_row) {
 				}
 			}
 
-			array_push($grid_headers, new Grid_header(get_grid_item_classes($rests_span), intval(1/min($rests_span))));				
+			$min_rest = min($rests_span);
+			$min_rest = ($min_rest == 0) ? 0 : intval(1/$min_rest);
+
+			array_push($grid_headers, new Grid_header(get_grid_item_classes($rests_span), $min_rest));				
 		}
 
 	}
@@ -165,6 +169,9 @@ function get_grid_headers($number_of_items, $preffered_item_span_per_row) {
 
 function get_grid_item_class($span) {
 	switch ($span) {
+		case 0:
+		return "no";
+		break;
 		case 0.25:
 		return "one-quarter";
 		break;
