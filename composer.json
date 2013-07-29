@@ -1,5 +1,5 @@
 {
-    "name": "dynamiccommunication/inuit-gridifier",
+    "name": "dynamiccommunication/php-inuit-gridifier",
     "type": "wordpress-plugin",
     "description": "A helper for building grids with the inuit css framework.",
     "authors": [
