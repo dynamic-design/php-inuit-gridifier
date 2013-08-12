@@ -79,7 +79,7 @@ class Inuit_Gridifier {
 		
 		// If optional extra
 		if ( ! empty( $extraClasses ) > 0 ) {
-			$grid_class .= ' ' . implode(' ', $extraClasses);
+			$grid_class .= ' ' . $extraClasses;
 		}
 		return $grid_class; 
 	}
