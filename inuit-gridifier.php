@@ -75,7 +75,7 @@ class Inuit_Gridifier {
 	 */
 	public function get_class($extraClasses = '')
 	{
-		$grid_class = 'grid__item lap-' . $this->classes[$this->colsCurrentRow];
+		$grid_class = 'grid__item desk-' . $this->classes[$this->colsCurrentRow];
 		
 		// If optional extra
 		if ( ! empty( $extraClasses ) > 0 ) {
