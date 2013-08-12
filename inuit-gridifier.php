@@ -34,7 +34,7 @@ class Inuit_Gridifier {
 		1 => 'one-whole',
 		2 => 'one-half',
 		3 => 'one-third',
-		4 => 'one-forth',
+		4 => 'one-quarter',
 		5 => 'one-fifth'
 		);
 
