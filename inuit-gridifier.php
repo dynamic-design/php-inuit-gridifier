@@ -1,197 +1,97 @@
 <?php 
-
-/*
-Plugin Name: inuit-gridifier
-Plugin URI: http://#
-Description: Nude gal, a plugin that strips post gallery images of formating with hook option.
-Version: 1.0
-Author: volontarresor
-Author URI: http://volontarresor.se
-*/
-
-/* ****************
-	Grid generator
-******************* */
-
-
-function get_grid_item_classes($spans) {
-	$classes = array("", "lap-", "desk-");
-
-	foreach ($spans as $i => $span) {
-		$classes[$i] .= get_grid_item_class($spans[$i]);
-	}
-
-	return join(" ", $classes);
-}
-
 /**
-* 
-*/
-class Grid
-{
-	private $grid_items;
-	function __construct($grid_items)
+ * Class to easily generate Inuit CSS classes with fallback if a row is not filled up
+ * with the preferred number of columns
+ *
+ * Usage:
+ * 1. Create the class and pass your total number of items and your preferred amount 
+ *    of columns per row.
+ * 2. Iterate over your collection and use the start_loop() method where you want to
+ *    output your rows and end_loop() where you want to close the rows.
+ * 3. In between these two methods, use the get_class() method to get the calculated
+ *    CSS grid class for the current iterated item.
+ *
+ * Example:
+ * 	// Five items and preferred 2 columns per row
+ * 	$items = array('one', 'two', 'three', 'four', 'five');
+ *  $gridifier = new Inuit_Gridifier($items, 2);
+ *
+ * 	foreach($items as $item) {
+ *  	$gridifier->start_loop();
+ *   		echo '<div class="' . $gridifier->get_class() . '">' . $item . '</div>';
+ * 		$gridifier->end_loop();
+ * 	}
+ *  
+ */
+class Inuit_Gridifier {
+
+	private $numberOfItems;
+	private $currentItem;
+	private $colsCurrentRow;
+	private $numberOfPreferredCols;
+
+	private $classes = array(
+		1 => 'one-whole',
+		2 => 'one-half',
+		3 => 'one-third',
+		4 => 'one-forth',
+		5 => 'one-fifth'
+		);
+
+	/**
+	 * Create a new instance
+	 * @param integer $numberOfItems         Total number of items in iterated collection
+	 * @param integer $numberOfPreferredCols Preferred number of columns for each row
+	 */
+	public function __construct( $numberOfItems = 0, $numberOfPreferredCols = 3 )
 	{
-		$this->grid_items = $grid_items;
+		// Make sure the number of columns are supported
+		if ( ! array_key_exists( $numberOfItems, $this->classes ) ) {
+			throw new InvalidArgumentException( $numberOfItems . ' columns are not supported');
+		}
+
+		$this->numberOfItems = $numberOfItems;
+		$this->numberOfPreferredCols = $numberOfPreferredCols;
+		
+		$this->currentItem = 0;
 	}
 
-	private function get_items() {
-		return join("<!-- -->", $this->grid_items);
-	}
-
-	public function __toString() {
-		return "<div class=\"grid\">" . $this->get_items() . "</div>";
-	}
-}
-
-/**
-* 
-*/
-class Grid_item
-{
-	private $header;
-	private $contents;
-	
-	function __construct($contents)
+	public function start_loop()
 	{
-		$this->contents = $contents;
-	}
+		// Open row if even muliplier with cols per row
+		if ( ($this->currentItem % $this->numberOfPreferredCols) === 0 ) {
+			echo '<div class="grid">';
 
-	public function set_header($header) {
-		$this->header = $header;
-	}
-
-	private function get_header(){
-		return "<div class=\"grid__item " . $this->header . "\">";
-	}
-
-	public function __toString() {
-		return $this->get_header() . $this->contents . "</div>";
-	}
-}
-
-
-function gridify($grid_items, $preffered_item_span_per_row) {
-	$number_of_items = sizeof($grid_items);
-	$grid_item_headers = get_grid_headers($number_of_items, $preffered_item_span_per_row);
-
-	$expected_ordered_a = array();
-
-	foreach ($grid_item_headers as $grid_item_header) {
-		$expected = $grid_item_header->get_expected_items_in_grid();
-		$tmp = array_key_exists($expected, $expected_ordered_a) ? $expected_ordered_a[$expected] : array();
-		array_push($tmp, $grid_item_header);
-		$expected_ordered_a[$expected] = $tmp;
-	}
-
-
-	$grids = array();
-	foreach ($expected_ordered_a as $expexted_ordered => $header_array) {
-
-		$rows_with_these_headers = ($expexted_ordered == 0) ? 0 : sizeof($header_array)/$expexted_ordered;
-
-		for ($i = 0; $i < $rows_with_these_headers ; $i++) {
-			$grid_items_with_headers = array();
-
-			for ($j=0; $j < $expexted_ordered; $j++) {
-				$finished_grid_item = array_pop($grid_items); 
-				$finished_grid_item->set_header($header_array[0]);
-
-				array_push( $grid_items_with_headers, $finished_grid_item );
-			}
-
-			array_push($grids, new Grid($grid_items_with_headers));
+			// Calculate number of items on this row
+			$itemsLeft = $this->numberOfItems - $this->currentItem;
+			$this->colsCurrentRow = ($itemsLeft > $this->numberOfPreferredCols) ? $this->numberOfPreferredCols : $itemsLeft;
 		}
 	}
 
-	return join("",$grids);
-}
-
-/**
-* 
-*/
-class Grid_header
-{
-	private $header;
-	private $expected_items_in_grid;
-	
-	function __construct($header, $expected_items_in_grid)
+	/**
+	 * Gets the grid item CSS classes for the iterated item
+	 * @param  string $extraClasses Extra CSS classes for each grid item
+	 * @return string               CSS classes
+	 */
+	public function get_class($extraClasses = '')
 	{
-		$this->header = $header;
-		$this->expected_items_in_grid = $expected_items_in_grid;
-	}
-
-	public function get_header() {
-		return $this->header;
-	}
-
-	public function get_expected_items_in_grid() {
-		return $this->expected_items_in_grid;
-	}
-
-	public function __toString() {
-
-		return $this->header;
-	}
-}
-
-function get_grid_headers($number_of_items, $preffered_item_span_per_row) {
-	$rests = array(0,0,0);
-	foreach ($preffered_item_span_per_row as $i => $span) {
-		$rests[$i] = $number_of_items % (1/$preffered_item_span_per_row[$i]);
-	}
-
-	$grid_headers = array();
-
-	for ($i=0; $i < $number_of_items ; $i++) {
-		if($i < $number_of_items - max($rests)) {
-			array_push($grid_headers, new Grid_header(get_grid_item_classes($preffered_item_span_per_row), intval(1/min($preffered_item_span_per_row))));
-		}else {
-			$rests_span = array();
-			foreach ($rests as $j => $rest) {
-				if($rests[$j] == 0) {
-					$rests_span[$j] = 0;
-				}else {
-					$rests_span[$j] = round(1/$rests[$j], 2);
-				}
-			}
-
-			$min_rest = min($rests_span);
-			$min_rest = ($min_rest == 0) ? 0 : intval(1/$min_rest);
-
-			array_push($grid_headers, new Grid_header(get_grid_item_classes($rests_span), $min_rest));				
+		$grid_class = 'grid__item ' . $this->classes[$this->colsCurrentRow];
+		
+		// If optional extra
+		if ( ! empty( $extraClasses ) > 0 ) {
+			$grid_class .= ' ' . implode(' ', $extraClasses);
 		}
-
+		return $grid_class; 
 	}
 
-	return array_reverse($grid_headers);
-}
+	public function end_loop()
+	{
+		$this->currentItem++;
 
-function get_grid_item_class($span) {
-	switch ($span) {
-		case 0:
-		return "no";
-		break;
-		case 0.25:
-		return "one-quarter";
-		break;
-		case 0.33:
-		return "one-third";
-		break;
-		case 0.5:
-		return "one-half";
-		break;
-		case 0.66:
-		return "two-thirds";
-		break;
-		case 0.75:
-		return "three-quarters";
-		break;
-		case 1:
-		return "one-whole";
-		break;
-		default:
-		return "one-whole";
-		break;
+		// Close row when filled up AND on the very last item
+		if ( ( ( $this->currentItem ) % $this->numberOfPreferredCols) === 0
+			|| $this->currentItem === $this->numberOfItems ) {
+			echo '</div><!-- .grid -->';
+		}
 	}
 }

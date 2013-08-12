@@ -3,9 +3,10 @@
     "type": "wordpress-plugin",
     "description": "A helper for building grids with the inuit css framework.",
     "authors": [
+    	{"name": "Joakim Gustin", "email": "joakim@dynamiccommunication.se"},
         {"name": "Patrik Göthe", "email": "patrik.got@gmail.com"}
     ],
-    "require": {
-        "composer/installers": "~1.0"
+    "autoload": {
+        "classmap": ["inuit-gridifier.php"]
     }
 }
