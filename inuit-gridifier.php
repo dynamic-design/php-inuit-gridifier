@@ -12,9 +12,11 @@
  *    CSS grid class for the current iterated item.
  *
  * Example:
- * 	// Five items and preferred 2 columns per row
- * 	$items = array('one', 'two', 'three', 'four', 'five');
- *  $gridifier = new Inuit_Gridifier($items, 2);
+ * 	// Seven items and preferred 3 columns per row
+ * 	$items = array('one', 'two', 'three', 'four', 'five', 'six', 'seven');
+ * 	// To prevent the seventh item to be fullwidth, we specify a minimum of two cols per row.
+ * 	// This means the seventh item will be one-half in this case
+ *  $gridifier = new Inuit_Gridifier($items, 3, 2);
  *
  * 	foreach($items as $item) {
  *  	$gridifier->start_loop();
@@ -29,6 +31,7 @@ class Inuit_Gridifier {
 	private $currentItem;
 	private $colsCurrentRow;
 	private $numberOfPreferredCols;
+	private $numberOfMinimumCols;
 
 	private $classes = array(
 		1 => 'one-whole',
@@ -42,8 +45,9 @@ class Inuit_Gridifier {
 	 * Create a new instance
 	 * @param integer $numberOfItems         Total number of items in iterated collection
 	 * @param integer $numberOfPreferredCols Preferred number of columns for each row
+	 * @param integer $numberOfMinimumCols The minimum amount of cols per row, use this to prevent falling back too far and get too wide
 	 */
-	public function __construct( $numberOfItems = 0, $numberOfPreferredCols = 3 )
+	public function __construct( $numberOfItems = 0, $numberOfPreferredCols = 3, $numberOfMinimumCols = null )
 	{
 		// Make sure the number of columns are supported
 		if ( ! array_key_exists( $numberOfItems, $this->classes ) ) {
@@ -52,6 +56,7 @@ class Inuit_Gridifier {
 
 		$this->numberOfItems = $numberOfItems;
 		$this->numberOfPreferredCols = $numberOfPreferredCols;
+		$this->numberOfMinimumCols = $numberOfMinimumCols;
 		
 		$this->currentItem = 0;
 	}
@@ -64,7 +69,10 @@ class Inuit_Gridifier {
 
 			// Calculate number of items on this row
 			$itemsLeft = $this->numberOfItems - $this->currentItem;
-			$this->colsCurrentRow = ($itemsLeft > $this->numberOfPreferredCols) ? $this->numberOfPreferredCols : $itemsLeft;
+			$colsCurrentRow = ($itemsLeft > $this->numberOfPreferredCols) ? $this->numberOfPreferredCols : $itemsLeft;
+
+			// Make sure we dont fall back too far
+			$this->colsCurrentRow = ($colsCurrentRow < $this->numberOfMinimumCols) ? $this->numberOfMinimumCols : $colsCurrentRow;
 		}
 	}
 
