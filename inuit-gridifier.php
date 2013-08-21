@@ -94,13 +94,14 @@ class Inuit_Gridifier {
 		if ( ! empty( $extraClasses ) > 0 ) {
 			$grid_class .= ' ' . $extraClasses;
 		}
+		
+		$this->currentItem++;
+		
 		return $grid_class; 
 	}
 
 	public function end_loop()
 	{
-		$this->currentItem++;
-
 		// Close row when filled up AND on the very last item
 		if ( ( ( $this->currentItem ) % $this->numberOfPreferredCols) === 0
 			|| $this->currentItem === $this->numberOfItems ) {
