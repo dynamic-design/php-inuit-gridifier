@@ -50,8 +50,13 @@ class Inuit_Gridifier {
 	public function __construct( $numberOfItems = 0, $numberOfPreferredCols = 3, $numberOfMinimumCols = null )
 	{
 		// Make sure the number of columns are supported
-		if ( ! array_key_exists( $numberOfItems, $this->classes ) ) {
+		if ( ! array_key_exists( $numberOfPreferredCols, $this->classes ) ) {
 			throw new InvalidArgumentException( $numberOfItems . ' columns are not supported');
+		}
+		
+		// Make sure the preferred is >= minimum amount per column
+		if ( $numberOfMinimumCols > $numberOfPreferredCols) {
+			throw new InvalidArgumentException( 'Minimum col amount cannot be bigger than the preferred' );	
 		}
 
 		$this->numberOfItems = $numberOfItems;
