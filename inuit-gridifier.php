@@ -70,14 +70,14 @@ class Inuit_Gridifier {
 	{
 		// Open row if even muliplier with cols per row
 		if ( ($this->currentItem % $this->numberOfPreferredCols) === 0 ) {
-			echo '<div class="grid">';
-
 			// Calculate number of items on this row
 			$itemsLeft = $this->numberOfItems - $this->currentItem;
 			$colsCurrentRow = ($itemsLeft > $this->numberOfPreferredCols) ? $this->numberOfPreferredCols : $itemsLeft;
 
 			// Make sure we dont fall back too far
 			$this->colsCurrentRow = ($colsCurrentRow < $this->numberOfMinimumCols) ? $this->numberOfMinimumCols : $colsCurrentRow;
+
+			echo '<div class="grid cols-' . $colsCurrentRow . '">';
 		}
 	}
 
