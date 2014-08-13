@@ -3,7 +3,7 @@
     "type": "library",
     "description": "A helper for building grids with the inuit css framework.",
     "authors": [
-    	{"name": "Joakim Gustin", "email": "joakim@dynamiccommunication.se"},
+    	{"name": "Joakim Gustin", "email": "joakim@dynamic-design.se"},
         {"name": "Patrik Göthe", "email": "patrik.got@gmail.com"}
     ],
     "autoload": {
