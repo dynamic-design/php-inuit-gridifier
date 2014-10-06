@@ -1,5 +1,5 @@
 {
-    "name": "dynamic-design/php-inuit-gridifier",
+    "name": "dynamic-group/php-inuit-gridifier",
     "type": "library",
     "description": "A helper for building grids with the inuit css framework.",
     "authors": [
